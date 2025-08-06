@@ -1,0 +1,445 @@
+/* style.css */
+
+/* Menggunakan font Inter untuk tampilan yang bersih */
+body {
+    font-family: 'Inter', sans-serif;
+    /* Gradien latar belakang yang lebih dinamis dan kompleks */
+    background: linear-gradient(160deg, #1a2a6c, #b21f1f, #fdbb2d); /* Gradien 3 warna yang lebih mencolok */
+    background-size: 600% 600%; /* Ukuran lebih besar untuk pergerakan gradien yang lebih heboh */
+    animation: gradientAnimation 25s ease infinite alternate,
+               sparkleBackground 15s infinite alternate; /* Tambah animasi sparkle */
+    display: flex; /* Untuk centering */
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1rem;
+    overflow: hidden; /* Mencegah scrollbar selama transisi */
+    position: relative; /* Untuk elemen animasi tambahan */
+}
+
+/* Animasi gradien latar belakang body */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+/* Animasi sparkle/noise pada latar belakang body */
+@keyframes sparkleBackground {
+    0% { filter: brightness(1); }
+    30% { filter: brightness(1.1); }
+    60% { filter: brightness(0.9); }
+    100% { filter: brightness(1); }
+}
+
+/* Penyesuaian untuk sel istirahat agar terlihat berbeda */
+.break-cell {
+    background-color: #fef3c7; /* Warna kuning muda untuk istirahat */
+    font-weight: bold;
+    color: #d97706; /* Warna teks oranye gelap */
+    animation: bounceIn 0.8s ease-out; /* Animasi masuk yang lebih heboh */
+}
+
+/* Animasi bounce-in untuk break-cell */
+@keyframes bounceIn {
+    0%, 20%, 40%, 60%, 80%, 100% {
+        transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    0% {
+        opacity: 0;
+        transform: scale3d(0.3, 0.3, 0.3);
+    }
+    20% {
+        transform: scale3d(1.1, 1.1, 1.1);
+    }
+    40% {
+        transform: scale3d(0.9, 0.9, 0.9);
+    }
+    60% {
+        opacity: 1;
+        transform: scale3d(1.03, 1.03, 1.03);
+    }
+    80% {
+        transform: scale3d(0.97, 0.97, 0.97);
+    }
+    100% {
+        opacity: 1;
+        transform: scale3d(1, 1, 1);
+    }
+}
+
+/* Gaya untuk header tabel */
+th {
+    background-color: #3b82f6; /* Warna biru cerah */
+    color: #ffffff; /* Teks putih */
+    padding: 1rem 1.25rem; /* Padding lebih besar */
+    font-size: 0.875rem; /* text-sm */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2); /* Bayangan teks lebih kuat */
+}
+/* Gaya untuk baris genap */
+tr:nth-child(even) {
+    background-color: #bfdbfe; /* Warna biru sangat muda */
+}
+/* Gaya untuk baris ganjil */
+tr:nth-child(odd) {
+    background-color: #ffffff; /* Warna putih */
+}
+/* Efek hover pada baris tabel */
+tbody tr:hover {
+    background-color: #74b9ff; /* Warna biru lebih gelap dan hidup saat di-hover */
+    transform: scale(1.02) rotateZ(1deg); /* Sedikit membesar dan berputar */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2); /* Bayangan lebih kuat */
+    transition: all 0.2s ease-out;
+}
+/* Gaya untuk sel mata kuliah yang bisa diklik */
+.subject-cell {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden; /* Untuk efek sparkle */
+}
+.subject-cell::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%; /* Mulai lebih jauh */
+    width: 200%; /* Lebih lebar */
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent); /* Gradien sparkle */
+    transform: skewX(-30deg);
+    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Transisi lebih dinamis */
+}
+.subject-cell:hover::after {
+    left: 150%; /* Berakhir lebih jauh */
+}
+.subject-cell:hover {
+    font-weight: bold;
+    color: #003366; /* Warna teks biru gelap yang lebih dalam */
+    transform: translateY(-3px) scale(1.01); /* Lebih naik dan sedikit membesar */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-out;
+}
+td {
+    padding: 1.25rem; /* Padding lebih besar untuk semua sel data */
+    font-size: 1rem; /* text-base */
+    transition: background-color 0.3s ease, transform 0.2s ease-out; /* Transisi untuk hover */
+}
+
+
+/* --- Animasi Entrance untuk Kontainer Utama --- */
+@keyframes fadeInSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9); /* Mulai lebih rendah dan kecil */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.animate-entrance {
+    animation: fadeInSlideUp 1s ease-out forwards; /* Animasi lebih lambat dan dramatis */
+    opacity: 0; /* Mulai dengan tidak terlihat */
+}
+
+/* --- Animasi Fade-in dan Pop untuk Setiap Sel Tabel --- */
+@keyframes cellPopIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) rotateZ(-10deg); /* Mulai lebih kecil dan berputar */
+    }
+    70% {
+        transform: scale(1.1) rotateZ(2deg); /* Sedikit overshoot */
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotateZ(0deg);
+    }
+}
+
+/* Kelas untuk sel yang akan dianimasikan */
+.animated-cell {
+    opacity: 0; /* Sembunyikan di awal */
+}
+
+
+/* --- Gaya Modal Pop-up --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Latar belakang lebih gelap */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+.modal-content {
+    background-color: #ffffff;
+    padding: 3rem; /* Lebih banyak padding */
+    border-radius: 1.5rem; /* Sudut lebih membulat */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); /* Bayangan lebih kuat */
+    max-width: 90%;
+    width: 550px; /* Sedikit lebih lebar */
+    transform: scale(0.8); /* Mulai lebih kecil */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animasi bounce */
+    position: relative;
+    text-align: center;
+}
+.modal-overlay.show .modal-content {
+    transform: scale(1);
+}
+.modal-close-button {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    background: none;
+    border: none;
+    font-size: 1.8rem; /* Ukuran lebih besar */
+    cursor: pointer;
+    color: #6b7280;
+    transition: color 0.2s ease;
+}
+.modal-close-button:hover {
+    color: #ef4444; /* Warna merah saat hover */
+    transform: rotate(90deg); /* Berputar saat hover */
+}
+.modal-title {
+    font-size: 2.2rem; /* text-4xl */
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+.modal-description {
+    font-size: 1.25rem; /* text-xl */
+    color: #4b5563;
+    line-height: 1.8;
+}
+
+/* --- Gaya Baru untuk Ikon Sosial --- */
+.social-icon-wrapper {
+    position: fixed;
+    width: 60px; /* Ukuran wrapper sedikit lebih besar dari SVG */
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%; /* Bentuk lingkaran */
+    background-color: #ffffff; /* Latar belakang putih */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); /* Bayangan untuk kedalaman */
+    transition: all 0.3s ease-in-out; /* Transisi halus untuk hover */
+    cursor: pointer;
+    z-index: 999;
+    /* Animasi masuk ikon */
+    animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* Animasi pop-in lebih heboh */
+    opacity: 0;
+}
+
+@keyframes popIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.2) translateY(50px) rotateZ(-30deg);
+    }
+    70% {
+        transform: scale(1.1) translateY(-10px) rotateZ(5deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0) rotateZ(0deg);
+    }
+}
+
+/* Penundaan animasi untuk setiap ikon */
+#saweria-icon-wrapper { animation-delay: 1.0s; }
+#instagram-icon-wrapper { animation-delay: 1.2s; }
+#github-icon-wrapper { animation-delay: 1.4s; }
+
+
+.social-icon-wrapper:hover {
+    transform: scale(1.2) translateY(-5px) rotate(10deg); /* Lebih menonjol dan berputar lebih banyak saat hover */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4); /* Bayangan lebih kuat saat hover */
+    filter: brightness(1.1); /* Sedikit lebih terang */
+}
+
+/* Animasi pulse untuk ikon saat idle */
+@keyframes pulse {
+    0% { transform: scale(1) rotateZ(0deg); }
+    50% { transform: scale(1.08) rotateZ(3deg); } /* Pulse lebih kuat dan berputar */
+    100% { transform: scale(1) rotateZ(0deg); }
+}
+
+.social-icon-wrapper:not(.saweria-active-state):not(.instagram-active-state):not(.github-active-state) {
+    animation: pulse 2.5s infinite ease-in-out; /* Terapkan animasi pulse yang lebih kuat */
+}
+
+/* Posisi spesifik untuk setiap ikon */
+#saweria-icon-wrapper {
+    bottom: 8rem;
+    left: 1rem;
+}
+#instagram-icon-wrapper {
+    bottom: 4.5rem;
+    left: 1rem;
+}
+#github-icon-wrapper {
+    bottom: 1rem;
+    left: 1rem;
+}
+
+/* Ukuran SVG di dalam wrapper */
+.social-icon-wrapper svg {
+    width: 36px; /* Ukuran SVG sedikit lebih besar */
+    height: 36px;
+}
+
+/* Gaya untuk ikon saat aktif (diklik) */
+.saweria-active-state, .instagram-active-state, .github-active-state {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(5) rotateZ(360deg) !important; /* Membesar sangat heboh dan berputar penuh */
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important; /* Bayangan sangat kuat */
+    transition: all 1.0s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important; /* Transisi yang lebih panjang dan dinamis */
+    border-radius: 50% !important; /* Pastikan tetap lingkaran */
+    z-index: 1002 !important; /* Pastikan di atas layar donasi */
+    animation: none !important; /* Hentikan animasi pulse saat aktif */
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8)); /* Efek glow putih */
+}
+
+/* Gaya untuk elemen yang akan menghilang */
+.fade-out {
+    opacity: 0 !important;
+    transition: opacity 0.6s ease-out; /* Transisi fade-out lebih lambat */
+    pointer-events: none; /* Nonaktifkan interaksi saat memudar */
+    transform: scale(0.8) translateY(20px); /* Sedikit mengecil dan bergeser saat memudar */
+}
+
+/* Gaya untuk layar donasi/pesan */
+#donation-screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Gradien biru-hitam yang lebih kompleks dan dinamis */
+    background: radial-gradient(circle at top left, #001f3f, #000000),
+                radial-gradient(circle at bottom right, #003366, #0a0a2a);
+    background-blend-mode: screen; /* Campur gradien */
+    background-size: 300% 300%; /* Ukuran lebih besar untuk pergerakan */
+    animation: backgroundPulse 8s infinite alternate; /* Animasi latar belakang lebih cepat */
+    z-index: 1001; /* Di atas konten normal tapi di bawah ikon aktif */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out; /* Transisi layar donasi lebih lambat */
+}
+#donation-screen.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Animasi latar belakang layar donasi */
+@keyframes backgroundPulse {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+/* Gaya untuk teks animasi donasi */
+#donation-typed-text {
+    color: #ffffff;
+    font-size: 3.5rem; /* Ukuran teks lebih besar */
+    margin-top: 2.5rem; /* Jarak lebih besar dari ikon */
+    opacity: 0; /* Mulai dengan tidak terlihat */
+    animation: fadeInText 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; /* Animasi bounce-in untuk teks */
+    animation-delay: 1.0s; /* Muncul setelah ikon bergerak */
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.5); /* Bayangan teks lebih kuat */
+    letter-spacing: 0.1em; /* Jarak antar huruf */
+}
+
+@keyframes fadeInText {
+    0% {
+        opacity: 0;
+        transform: translateY(50px) scale(0.8);
+    }
+    70% {
+        transform: translateY(-10px) scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Peningkatan tema keseluruhan */
+#schedule-container {
+    border: 3px solid rgba(255, 255, 255, 0.7); /* Border lebih tebal dan jelas */
+    backdrop-filter: blur(10px) brightness(1.1); /* Efek kaca buram lebih kuat dan cerah */
+    background-color: rgba(255, 255, 255, 0.85); /* Latar belakang sedikit lebih transparan */
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3); /* Bayangan lebih kuat */
+    transition: all 0.6s ease-out; /* Transisi untuk perubahan tema */
+    transform: scale(1); /* Pastikan skala awal normal */
+}
+
+td, th {
+    color: #222; /* Teks lebih gelap untuk kontras lebih baik */
+}
+
+.modal-content {
+    background-color: #f0f8ff; /* Latar belakang modal lebih terang */
+    border: 2px solid #a0aec0; /* Border lebih jelas */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); /* Bayangan modal sangat kuat */
+}
+
+.modal-title {
+    color: #001f3f; /* Warna judul modal lebih gelap */
+}
+
+.modal-description {
+    color: #333; /* Warna deskripsi modal lebih gelap */
+}
+
+/* Gaya untuk pesan sambutan */
+.greeting-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.5rem; /* Ukuran teks besar */
+    font-weight: bold;
+    color: #ffffff; /* Warna teks putih */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Bayangan teks */
+    z-index: 1003; /* Pastikan di atas semua elemen lain */
+    opacity: 0; /* Mulai tersembunyi */
+    visibility: hidden;
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    text-align: center;
+    width: 90%; /* Pastikan responsif */
+    max-width: 600px;
+}
+
+.greeting-message.show {
+    opacity: 1;
+    visibility: visible;
+    animation: fadeInScale 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* Animasi masuk */
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}

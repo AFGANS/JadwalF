@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Pelajaran SMK 7 Jurusan Animasi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Menggunakan font Inter untuk tampilan yang bersih */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe, #c5e1f7, #a8d0ed); /* Gradien biru muda */
+            background-size: 400% 400%; /* Ukuran lebih besar untuk animasi */
+            animation: gradientAnimation 15s ease infinite; /* Animasi gradien */
+            display: flex; /* Untuk centering */
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+            overflow: hidden; /* Mencegah scrollbar selama transisi */
+        }
+
+        /* Animasi gradien latar belakang */
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Penyesuaian untuk sel istirahat agar terlihat berbeda */
+        .break-cell {
+            background-color: #fef3c7; /* Warna kuning muda untuk istirahat */
+            font-weight: bold;
+            color: #d97706; /* Warna teks oranye gelap */
+        }
+        /* Gaya untuk header tabel */
+        th {
+            background-color: #3b82f6; /* Warna biru cerah */
+            color: #ffffff; /* Teks putih */
+            padding: 1rem 1.25rem; /* Padding lebih besar */
+            font-size: 0.875rem; /* text-sm */
+        }
+        /* Gaya untuk baris genap */
+        tr:nth-child(even) {
+            background-color: #bfdbfe; /* Warna biru sangat muda */
+        }
+        /* Gaya untuk baris ganjil */
+        tr:nth-child(odd) {
+            background-color: #ffffff; /* Warna putih */
+        }
+        /* Efek hover pada baris tabel */
+        tbody tr:hover {
+            background-color: #93c5fd; /* Warna biru lebih gelap saat di-hover */
+            transition: background-color 0.3s ease;
+        }
+        /* Gaya untuk sel mata kuliah yang bisa diklik */
+        .subject-cell {
+            cursor: pointer;
+            position: relative;
+        }
+        .subject-cell:hover {
+            font-weight: bold;
+            color: #1e40af; /* Warna teks biru gelap saat di-hover */
+            transform: translateY(-2px); /* Sedikit naik saat di-hover */
+            transition: transform 0.2s ease-out;
+        }
+        td {
+            padding: 1.25rem; /* Padding lebih besar untuk semua sel data */
+            font-size: 1rem; /* text-base */
+            transition: background-color 0.3s ease, transform 0.2s ease-out; /* Transisi untuk hover */
+        }
+
+
+        /* --- Animasi Entrance untuk Kontainer Utama --- */
+        @keyframes fadeInSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-entrance {
+            animation: fadeInSlideUp 0.8s ease-out forwards;
+            opacity: 0; /* Mulai dengan tidak terlihat */
+        }
+
+        /* --- Animasi Fade-in dan Pop untuk Setiap Sel Tabel --- */
+        @keyframes cellPopIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Kelas untuk sel yang akan dianimasikan */
+        .animated-cell {
+            opacity: 0; /* Sembunyikan di awal */
+        }
+
+
+        /* --- Gaya Modal Pop-up --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            padding: 2.5rem; /* Lebih banyak padding */
+            border-radius: 1rem; /* Sudut lebih membulat */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            width: 500px;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+            position: relative;
+            text-align: center;
+        }
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+        .modal-close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .modal-close-button:hover {
+            color: #1f2937;
+        }
+        .modal-title {
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+        .modal-description {
+            font-size: 1.125rem; /* text-lg */
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        /* --- Gaya Baru untuk Ikon Sosial --- */
+        .social-icon-wrapper {
+            position: fixed;
+            width: 56px; /* Ukuran wrapper sedikit lebih besar dari SVG */
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%; /* Bentuk lingkaran */
+            background-color: #ffffff; /* Latar belakang putih */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Bayangan untuk kedalaman */
+            transition: all 0.3s ease-in-out; /* Transisi halus untuk hover */
+            cursor: pointer;
+            z-index: 999;
+        }
+
+        .social-icon-wrapper:hover {
+            transform: scale(1.1) translateY(-3px); /* Lebih menonjol saat hover */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Bayangan lebih kuat saat hover */
+        }
+
+        /* Animasi pulse untuk ikon saat idle */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .social-icon-wrapper:not(.saweria-active-state):not(.instagram-active-state):not(.github-active-state) {
+            animation: pulse 2s infinite ease-in-out; /* Terapkan animasi pulse */
+        }
+
+        /* Posisi spesifik untuk setiap ikon */
+        #saweria-icon-wrapper {
+            bottom: 8rem;
+            left: 1rem;
+        }
+        #instagram-icon-wrapper {
+            bottom: 4.5rem;
+            left: 1rem;
+        }
+        #github-icon-wrapper {
+            bottom: 1rem;
+            left: 1rem;
+        }
+
+        /* Ukuran SVG di dalam wrapper */
+        .social-icon-wrapper svg {
+            width: 32px; /* Ukuran SVG sedikit lebih kecil dari wrapper */
+            height: 32px;
+        }
+
+        /* Gaya untuk ikon saat aktif (diklik) */
+        .saweria-active-state, .instagram-active-state, .github-active-state {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) scale(3) !important; /* Membesar dan ke tengah */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4) !important; /* Bayangan lebih kuat */
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important; /* Transisi yang lebih dinamis */
+            border-radius: 50% !important; /* Pastikan tetap lingkaran */
+            z-index: 1002 !important; /* Pastikan di atas layar donasi */
+        }
+
+        /* Gaya untuk elemen yang akan menghilang */
+        .fade-out {
+            opacity: 0 !important;
+            transition: opacity 0.5s ease-out;
+        }
+
+        /* Gaya untuk layar donasi/pesan */
+        #donation-screen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); /* Gradien ungu-biru */
+            z-index: 1001; /* Di atas konten normal tapi di bawah ikon aktif */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.7s ease-in-out, visibility 0.7s ease-in-out;
+        }
+        #donation-screen.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Animasi latar belakang layar donasi */
+        @keyframes backgroundPulse {
+            0% { background-size: 400% 400%; background-position: 0% 50%; }
+            100% { background-size: 400% 400%; background-position: 100% 50%; }
+        }
+        #donation-screen.show {
+            animation: backgroundPulse 5s infinite alternate; /* Terapkan animasi saat muncul */
+        }
+
+        /* Gaya untuk teks animasi donasi */
+        #donation-typed-text {
+            color: #ffffff;
+            font-size: 3rem; /* Ukuran teks besar */
+            margin-top: 2rem;
+            opacity: 0; /* Mulai dengan tidak terlihat */
+            animation: fadeInText 1s forwards; /* Animasi fade-in untuk teks */
+            animation-delay: 0.8s; /* Muncul setelah ikon bergerak */
+        }
+
+        @keyframes fadeInText {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Peningkatan tema keseluruhan */
+        #schedule-container {
+            border: 2px solid rgba(255, 255, 255, 0.5); /* Border putih transparan */
+            backdrop-filter: blur(5px); /* Efek kaca buram */
+            background-color: rgba(255, 255, 255, 0.9); /* Latar belakang sedikit transparan */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Bayangan lebih kuat */
+        }
+
+        td, th {
+            color: #333; /* Teks lebih gelap untuk kontras lebih baik */
+        }
+
+        .modal-content {
+            background-color: #f8fafc; /* Latar belakang modal lebih terang */
+            border: 1px solid #cbd5e1; /* Border halus */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25); /* Bayangan modal lebih kuat */
+        }
+
+        .modal-title {
+            color: #1a202c;
+        }
+
+        .modal-description {
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div id="schedule-container" class="bg-white shadow-lg rounded-xl p-6 md:p-8 lg:p-10 max-w-5xl w-full">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-center text-gray-900 mb-8">
+            <span id="typed-title"></span> <!-- Span untuk efek pengetikan -->
+        </h1>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden">
+                <thead class="bg-gray-800">
+                    <tr>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tl-lg">
+                            Hari
+                        </th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                            Seragam
+                        </th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                            13:00 - 14:00
+                        </th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                            14:00 - 15:00
+                        </th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                            15:00 - 15:50
+                        </th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider break-cell">
+                            15:50 - 16:10 (Istirahat)
+                        </th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tr-lg">
+                            16:10 - 17:45
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <!-- Senin (4 Pelajaran) -->
+                    <tr>
+                        <td class="px-4 py-4 whitespace-nowrap text-base font-medium text-gray-900 animated-cell">Senin</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 animated-cell">Biru Putih</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mempelajari prinsip dasar visualisasi dalam animasi.">
+                            🎨 Visual Animasi
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mempelajari perkembangan teknologi dan teknik gerak objek digital.">
+                            💻 Perkembangan Teknologi Gerak Objek Digital
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mempelajari seni visual dan prinsip komposisi dalam konteks animasi.">
+                            🖼️ Seni Visual Komposisi
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 break-cell animated-cell">Istirahat</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mempelajari dasar-dasar sketsa dan ilustrasi digital untuk konsep animasi.">
+                            ✏️ Sketsa & Ilustrasi Digital
+                        </td>
+                    </tr>
+                    <!-- Selasa (3 Pelajaran) -->
+                    <tr>
+                        <td class="px-4 py-4 whitespace-nowrap text-base font-medium text-gray-900 animated-cell">Selasa</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 animated-cell">Biru Putih</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Meningkatkan kemampuan berbahasa Inggris untuk komunikasi global.">
+                            🗣️ Bahasa Inggris
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mempelajari dasar-dasar ilmu komputer dan teknologi informasi.">
+                            🖥️ Informatika
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 animated-cell">KOSONG</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 break-cell animated-cell">Istirahat</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mempelajari konsep dan aplikasi matematika.">
+                            ➕ Matematika
+                        </td>
+                    </tr>
+                    <!-- Rabu (3 Pelajaran) -->
+                    <tr>
+                        <td class="px-4 py-4 whitespace-nowrap text-base font-medium text-gray-900 animated-cell">Rabu</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 animated-cell">Biru Putih</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mempelajari peristiwa masa lalu dan dampaknya.">
+                            📜 Sejarah
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mengerjakan proyek-proyek terkait Ilmu Pengetahuan Alam dan Sosial.">
+                            🧪 Proyek IPAS
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 animated-cell">KOSONG</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 break-cell animated-cell">Istirahat</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mempelajari Pendidikan Jasmani, Olahraga, dan Kesehatan.">
+                            🏃 PJOK
+                        </td>
+                    </tr>
+                    <!-- Kamis (4 Pelajaran) -->
+                    <tr>
+                        <td class="px-4 py-4 whitespace-nowrap text-base font-medium text-gray-900 animated-cell">Kamis</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 animated-cell">Batik & Olahraga</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mempelajari nilai-nilai Pancasila dan penerapannya.">
+                            🏛️ Pendidikan Pancasila
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mempelajari wawasan tentang dunia industri dan karir.">
+                            🏭 Wawasan Industri
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Meningkatkan kemampuan berbahasa Indonesia.">
+                            📚 Bahasa Indonesia
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 break-cell animated-cell">Istirahat</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Meningkatkan kemampuan berbahasa Inggris untuk komunikasi global.">
+                            🗣️ Bahasa Inggris
+                        </td>
+                    </tr>
+                    <!-- Jumat (3 Pelajaran) -->
+                    <tr>
+                        <td class="px-4 py-4 whitespace-nowrap text-base font-medium text-gray-900 animated-cell">Jumat</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 animated-cell">Pramuka</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Meningkatkan kemampuan berbahasa Indonesia.">
+                            📚 Bahasa Indonesia
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mempelajari alur dan proses produksi animasi.">
+                            🎬 Alur Proses Animasi
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 animated-cell">KOSONG</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 break-cell animated-cell">Istirahat</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mengerjakan proyek-proyek terkait Ilmu Pengetahuan Alam dan Sosial.">
+                            🔬 Proyek IPAS
+                        </td>
+                    </tr>
+                    <!-- Sabtu (4 Pelajaran) -->
+                    <tr>
+                        <td class="px-4 py-4 whitespace-nowrap text-base font-medium text-gray-900 rounded-bl-lg animated-cell">Sabtu</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 animated-cell">Batik</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mempelajari teori dan praktik seni musik.">
+                            🎶 Seni Musik
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Mempelajari potensi lokal dan pendidikan agama Islam.">
+                            🕌 Muatan Lokal Potensi & Pendidikan Agama Islam
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 subject-cell animated-cell"
+                            data-description="Sesi bimbingan untuk pengembangan diri dan persiapan karir di industri kreatif.">
+                            🤝 Pengembangan Diri & Karir
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 break-cell animated-cell">Istirahat</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-base text-gray-700 rounded-br-lg animated-cell subject-cell"
+                            data-description="Mempelajari konsep dan aplikasi matematika.">
+                            ➗ Matematika
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-8 text-center text-lg font-semibold text-gray-800 p-4 bg-yellow-100 border border-yellow-300 rounded-lg shadow-md" id="sholat-reminder">
+            Jangan Lupa Sholat Saat Jam Istirahat! 🙏
+        </div>
+    </div>
+
+    <!-- Instagram Icon -->
+    <div class="social-icon-wrapper" id="instagram-icon-wrapper">
+        <a href="https://www.instagram.com/newganfxzx?igsh=M3R2b3drY3k1ZWw3&utm_source=qr" target="_blank" rel="noopener noreferrer" class="instagram-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-instagram text-pink-600 hover:text-pink-700">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+        </a>
+    </div>
+
+    <!-- GitHub Icon -->
+    <div class="social-icon-wrapper" id="github-icon-wrapper">
+        <a href="https://github.com/AFGANS" target="_blank" rel="noopener noreferrer" class="github-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-github text-gray-800 hover:text-gray-900">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg>
+        </a>
+    </div>
+
+    <!-- Saweria Icon -->
+    <div class="social-icon-wrapper" id="saweria-icon-wrapper">
+        <a href="https://saweria.co/AfganCT" target="_blank" rel="noopener noreferrer" class="saweria-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" class="text-green-500 hover:text-green-600">
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 3c2.761 0 5 2.239 5 5s-2.239 5-5 5-5-2.239-5-5 2.239-5 5-5zm-5 11c-2.761 0-5 2.239-5 5h10c0-2.761-2.239-5-5-5z"/>
+                <path fill="#fff" d="M12 3c2.761 0 5 2.239 5 5s-2.239 5-5 5-5-2.239-5-5 2.239-5 5-5zm-5 11c-2.761 0-5 2.239-5 5h10c0-2.761-2.239-5-5-5z"/>
+                <path fill="#fff" d="M12 4.5c1.933 0 3.5 1.567 3.5 3.5S13.933 11.5 12 11.5 8.5 9.933 8.5 8 10.067 4.5 12 4.5zM12 14c-2.761 0-5 2.239-5 5h10c0-2.761-2.239-5-5-5z"/>
+            </svg>
+        </a>
+    </div>
+
+    <!-- New donation screen container -->
+    <div id="donation-screen" class="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-400 to-pink-500 z-[1001] opacity-0 invisible">
+        <h2 id="donation-typed-text" class="text-white text-4xl md:text-5xl font-extrabold text-center"></h2>
+    </div>
+
+    <!-- Modal Pop-up Structure -->
+    <div id="subjectModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button" id="closeModalButton">&times;</button>
+            <h2 id="modalTitle" class="modal-title"></h2>
+            <p id="modalDescription" class="modal-description"></p>
+        </div>
+    </div>
+
+    <!-- Tautkan ke file JavaScript eksternal -->
+    <script src="main.js" defer></script>
+</body>
+</html>
